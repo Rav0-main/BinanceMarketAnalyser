@@ -1,76 +1,26 @@
-from random import randint
-from random import random
-from average import getAverageLineCoefficient
-import matplotlib.pyplot as plt
+from priceparser import *
+import graphic
+from datetime import (datetime,
+                      timedelta)
 
-def createMarketGraphicWithFixedStep(minY: int, maxY: int, stepX: int) -> list[tuple[int, float]]:
-    length: int = randint(100, 150)
-    pastX: int = -stepX
-    result: list[tuple[int, float]] = []
-    
-    x: int = 0
-    y: float = 0.0
+STR_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
 
-    for i in range(0, length):
-        x = pastX + stepX
-        y = randfloat(minY, maxY)
+CRYPTOCURRENCY_SYMBOL = "BTC"
 
-        result.append((x, y))
+bitcoinParser = PriceParserBinanceAPI(CRYPTOCURRENCY_SYMBOL)
+bitcoinParser.priceCount = 48
+bitcoinParser.timeInterval = "30m"
 
-        pastX = x
+prices = bitcoinParser.getPricesByProperties(datetime.now()-timedelta(days=1), datetime.now())
 
-    return result
+graphic.drawPriceGraphics(prices)
 
-def randfloat(minIntPart: int, maxIntPart: int) -> float:
-    return round(float(randint(minIntPart, maxIntPart)) + random(), randint(0, 6))
+graphic.setTitleName(f"{CRYPTOCURRENCY_SYMBOL} prices by datetime")
+graphic.setXLabel(f"Datetime, format: {STR_DATE_FORMAT}")
+graphic.setYLabel("Price, $")
 
-stepX: int = 1
-marketGraphic = createMarketGraphicWithFixedStep(170, 172, stepX)
-avgK = getAverageLineCoefficient(marketGraphic)
+graphic.setDateFormat(STR_DATE_FORMAT)
+graphic.setPriceFormat()
 
-marketX = list(map(lambda item: item[0], marketGraphic))
-marketY = list(map(lambda item: item[1], marketGraphic))
-
-xLeft = marketX[-1]
-xRight = marketX[-1] + stepX
-
-avgB = marketY[-1] - avgK * xLeft
-
-yLeft = marketY[-1]
-#yRight is next excepted Y value
-yRight = avgK * xRight + avgB
-
-#draw market
-plt.plot(
-    marketX, marketY,
-    'b-',
-    linewidth=3
-)  
-
-plt.scatter(
-    marketX, marketY, 
-    color='red', 
-    edgecolor='black', 
-    s=35,           
-    linewidths=1.2,  
-    zorder=3,
-)
-
-#draw avgline
-colorType = "r-" if avgK < 0 else "g-"
-plt.plot(
-    [xLeft, xRight], [yLeft, yRight],
-    colorType,
-    linewidth=3
-) 
-
-plt.scatter(
-    [xLeft, xRight], [yLeft, yRight], 
-    color='black', 
-    edgecolor='black', 
-    s=15,           
-    linewidths=1.5,  
-    zorder=3,
-)
-
-plt.show()
+graphic.showLegend()
+graphic.show()
