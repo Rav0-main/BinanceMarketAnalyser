@@ -57,3 +57,18 @@ class PriceParserBinanceAPI:
 
     def __raisePropertyNotInited(self, propertyName: str):
         raise NotSetPropertyException(f"Property '{propertyName}' not set!")
+    
+def getXYFormatFrom(prices: list[PriceInformation]) -> tuple[list[tuple[int, float]], list[tuple[int, float]]]:
+    """
+    Returns (open_prices, close_prices) from 'prices'
+    """
+    openPrices: list[tuple[int, float]] = []
+    closePrices: list[tuple[int, float]] = []
+
+    timestamp: int = 0
+    for price in prices:
+        timestamp = int(price.time.timestamp() * 1000)
+        openPrices.append((timestamp, price.open))
+        closePrices.append((timestamp, price.close))
+
+    return (openPrices, closePrices)
