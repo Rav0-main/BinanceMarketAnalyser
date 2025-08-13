@@ -47,7 +47,7 @@ def drawPriceGraphics(prices: list[PriceInformation], showOpenPrices=True, showC
 
 def drawLiniearGraphic(x: list, y: list[float], color: str, name: str) -> None:
     """
-    x[i] - datetime
+    x[i] - datetime\n
     y[i] - float
     """
     plt.plot(x, y, color=color, linestyle="-", marker="o", label=name)

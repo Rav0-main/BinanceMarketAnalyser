@@ -48,7 +48,7 @@ def drawPredictionPricesOf(symbol: str):
     cryptocurrenctParser.timeInterval = "30m"
     cryptocurrenctParser.priceCount = 336 + 1
 
-    endTime: datetime = datetime.now() - timedelta(days=0)
+    endTime: datetime = datetime.now() - timedelta(days=1)
     startTime: datetime = endTime - timedelta(days=7)
     sourcePrices: list[PriceInformation] = cryptocurrenctParser.getPricesByProperties(startTime, endTime)
 
@@ -121,6 +121,18 @@ def drawPredictionPriceWithRandomValues(minY: float, maxY: float):
 
     graphic.setDateFormat(STR_DATE_FORMAT)
     graphic.setPriceFormat()
+
+    graphic.showLegend()
+    graphic.show()
+
+def drawPredictionPricesOfSetValues(past: list[float], futureIndex: int):
+    market: list[tuple[int, float]] = [(i, past[i]) for i in range(0, len(past))]
+    
+    future: list[tuple[int, float]] = getPredictedFuturePricesIn(market, futureIndex)
+    future.insert(0, (len(past)-1, past[-1]))
+
+    graphic.drawLiniearGraphic([i for i in range(0, len(past))], past, "red", "Past")
+    graphic.drawLiniearGraphic([i[0] for i in future], [i[1] for i in future], "purple", "Future")
 
     graphic.showLegend()
     graphic.show()

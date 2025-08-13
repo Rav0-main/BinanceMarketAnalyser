@@ -37,7 +37,7 @@ def handleCryptocurrency(symbol: str):
     graphic.drawLiniearGraphic(futureCloseDatetimes, futureClosePriceValues, "purple", "Predicted close prices")
 
 STR_DATE_FORMAT = "%d.%m.%Y %H:%M:%S"
-CRYPTOCURRENCY_SYMBOL = "SOL"
+CRYPTOCURRENCY_SYMBOL = "BTC"
 
 handleCryptocurrency(CRYPTOCURRENCY_SYMBOL)
 

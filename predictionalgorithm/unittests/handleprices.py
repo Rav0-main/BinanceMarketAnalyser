@@ -97,7 +97,7 @@ def handlePricesOf(cryptocurrencies: list[str], parameters: ParametersToModellin
     print("TEST RESULT:")
     print(f"* all test count(with open and close prices): {testcaseCount*2}")
     print(f"* delta price(open and close) truth predicted count: {deltaPricePredictedCount}")
-    print(f"* precent of all test count: {deltaPricePredictedCount/(testcaseCount*2)*100}%")
+    print(f"* precent of test count with true predicted delta prices: {deltaPricePredictedCount/(testcaseCount*2)*100}%")
     
     print()
 
