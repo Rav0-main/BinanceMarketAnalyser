@@ -1,5 +1,7 @@
 from .graphichandler import IterationDataHandlerOfGraphic
+from .pricepredicter import PricePredicter
 from math import ceil
+from math import log as ln
 
 def generateAllImportanceCoefficients(marketGraphic: list[tuple[int, float]]) -> list[tuple[int, float]]:
     """
@@ -15,16 +17,16 @@ def generateAllImportanceCoefficients(marketGraphic: list[tuple[int, float]]) ->
     priceIterator = map(lambda x: x[1], marketGraphic)
     minPrice: float = min(priceIterator)
     
-    Pi: IterationDataHandlerOfGraphic = IterationDataHandlerOfGraphic(
+    marketGraphicAnalyser: IterationDataHandlerOfGraphic = IterationDataHandlerOfGraphic(
         (marketGraphic[0][0], marketGraphic[-1][0]),
         (minPrice, maxPrice)
     )
 
     pResults: list[tuple[int, float]] = []
-    Pi.currentMonotonicSequence.append(marketGraphic[0][1])
+    marketGraphicAnalyser.currentMonotonicSequence.append(marketGraphic[0][1])
     
     for timestamp, price in marketGraphic[1:]:
-        p: tuple[float, int] = Pi(timestamp, price)
+        p: tuple[float, int] = marketGraphicAnalyser(timestamp, price)
         pResults.append((timestamp, p[0]))
     
     return pResults
@@ -43,43 +45,46 @@ def getPredictedFuturePricesIn(marketGraphic: list[tuple[int, float]], futureTim
     futurePricesByTime: list[tuple[int, float]] = []
     avgDeltaTime: int = ceil((marketGraphic[-1][0] - marketGraphic[0][0]) / len(marketGraphic))
 
-    while(avgDeltaTime + marketGraphic[-1][0] < futureTime):
+    while(marketGraphic[-1][0] < futureTime):
         onlyPriceValues = [x[1] for x in marketGraphic]
-        maxPrice: float = max(onlyPriceValues)
-        minPrice: float = min(onlyPriceValues)
+        maximumPrice: float = max(onlyPriceValues)
+        mininumPrice: float = min(onlyPriceValues)
     
-        pGenerator: IterationDataHandlerOfGraphic = IterationDataHandlerOfGraphic(
+        marketGraphicAnalyser: IterationDataHandlerOfGraphic = IterationDataHandlerOfGraphic(
             (marketGraphic[0][0], marketGraphic[-1][0]),
-            (minPrice, maxPrice)
+            (mininumPrice, maximumPrice)
         )
 
         pastPrice: float = marketGraphic[0][1]
         pastTimestamp: float = marketGraphic[0][0]
-        avgDeltaTime: int = ceil((marketGraphic[-1][0] - marketGraphic[0][0]) / len(marketGraphic))
-        p: tuple[float, int] = (0, 0)
+
+        avgDeltaTime: int = ceil((marketGraphic[-1][0] - marketGraphic[0][0]) / (len(marketGraphic)-1))
+        avgDeltaTime: int = min(avgDeltaTime, futureTime-marketGraphic[-1][0])
+
+        pointAnalyse: tuple[float, int] = (0, 0)
+        
         upKavg: float = 0
         downKavg: float = 0
 
+        pricePredicter: PricePredicter = PricePredicter(
+            avgDeltaTime, marketGraphic[-1][1], marketGraphicAnalyser,
+            ln(maximumPrice / mininumPrice), ln(maximumPrice / mininumPrice)
+        )
+
         for timestamp, price in marketGraphic[1:]:
-            p = pGenerator(timestamp, price)
-            upKavg += p[0] * (price - pastPrice)
-            downKavg += p[0] * (timestamp - pastTimestamp)
+            pointAnalyse = marketGraphicAnalyser(timestamp, price)
+
+            upKavg += pointAnalyse[0] * (price - pastPrice)
+            downKavg += pointAnalyse[0] * (timestamp - pastTimestamp)
 
             pastPrice = price
             pastTimestamp = timestamp
 
         kAvg: float = upKavg / downKavg
-        futurePrice: float = kAvg * avgDeltaTime + marketGraphic[-1][1]
+        
+        futurePrice: float = pricePredicter.getPredictBy(kAvg, pointAnalyse)
 
-        if(p[1] == 0):
-            pass
-        else:
-            secondFuturePrice: float = (pastPrice + 
-            (pGenerator.downingCount * pGenerator.medianDeltaPriceInUpping - pGenerator.uppingCount * pGenerator.medianDeltaPriceInDowning)/(pGenerator.uppingCount + pGenerator.downingCount))
-
-            futurePrice = (futurePrice + secondFuturePrice) / 2
-
-        marketGraphic.append((avgDeltaTime + marketGraphic[-1][0], futurePrice))
+        marketGraphic.append((marketGraphic[-1][0] + avgDeltaTime, futurePrice))
         futurePricesByTime.append(marketGraphic[-1])
 
     return futurePricesByTime

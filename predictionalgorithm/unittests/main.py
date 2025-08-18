@@ -21,14 +21,14 @@ if __name__ == "__main__":
         drawImportanceCoefficientOf(CRYPTOCURRENCY_LIST[0])
 
     elif(NEED_DRAW_FUTURE_PRICES_OF_ONE_CRYPTOCURRENCY):
-        drawPredictionPricesOf(CRYPTOCURRENCY_LIST[-2])
+        drawPredictionPricesOf(CRYPTOCURRENCY_LIST[0])
 
     elif(NEED_DRAW_FUTURE_PRICES_OF_RANDOM_GRAPHIC):
         drawPredictionPriceWithRandomValues(100.05, 132.2)
 
     elif(NEED_DRAW_SET_PRICES):
-        past: list[float] = [1, 2, 3, 6, 7, 8, 10, 9, 6, 7, 5, 4, 3, 1, 0.5, 1.5, 2, 4, 3, 2.5, 1.5, 0.8, 0.6, 0.3, 0.2]
-        future: int = len(past) + 7
+        past: list[float] = [1, 2, 3, 6, 7, 8, 10, 9, 6, 7, 5, 4, 3, 1, 0.5, 1.5, 2, 4, 3, 2.5, 1.5, 0.8, 0.6, 0.3, 0.2, 0.8, 1.5, 2.3]
+        future: int = len(past) + 10
         drawPredictionPricesOfSetValues(past, future)
 
     else:

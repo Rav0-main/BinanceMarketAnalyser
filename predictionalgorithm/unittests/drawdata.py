@@ -54,7 +54,8 @@ def drawPredictionPricesOf(symbol: str):
 
     openPrices, closePrices = getXYFormatFrom(sourcePrices)
 
-    futureTime: int = int((endTime + timedelta(hours=11)).timestamp()*1000)
+    futureTime: int = int((endTime + timedelta(hours=12)).timestamp()*1000)
+
     futureOpenPrices = getPredictedFuturePricesIn(openPrices, futureTime)
     futureClosePrices = getPredictedFuturePricesIn(closePrices, futureTime)
 
@@ -75,7 +76,7 @@ def drawPredictionPricesOf(symbol: str):
     graphic.drawLiniearGraphic(futureOpenDatetimes, futureOpenPriceValues, "orange", "Predicted open prices")
     graphic.drawLiniearGraphic(futureCloseDatetimes, futureClosePriceValues, "purple", "Predicted close prices")
 
-    graphic.setTitleName(f"{symbol} predict vizualization")
+    graphic.setTitleName(f"{symbol} predict visualization")
     graphic.setXLabel(f"Datetime, format: {STR_DATE_FORMAT}")
     graphic.setYLabel("Price, $")
 
