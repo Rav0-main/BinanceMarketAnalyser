@@ -4,7 +4,7 @@ from math import exp
 class NotValidPointTypeException(Exception):
     pass
 
-class PricePredicter:
+class PriceValuePredicter:
     __deltaTime: int
     __lastPrice: float
     __analyser: IterationDataHandlerOfGraphic

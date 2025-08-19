@@ -1,8 +1,24 @@
+from os import path as osPath
+from sys import path as sysPath
+
+rootDirectory = osPath.dirname(osPath.abspath(__file__))
+sysPath.append(rootDirectory)
+
 from datetime import (datetime,
                       timedelta)
-from .general import DeltaDatetimeValidDiapasons
+from general import DeltaDatetimeValidDiapasons
 
 def getDatetimeFrom(string: str) -> datetime:
+    """
+    Returns datetime object from 'string':
+     * If 'string' starts with "now", then the following options are possible:
+        1. 'string' is simple "now" => datetime.now()
+        2. 'string' have pattern "now-np", where n - number, p - char of time (m - minutes, h - hours, d - days) => datetime.now()-timedeltaOfPattern.\n
+           For example "now-3h" => datetime.now()-timedelta(hours=3) 
+        3. 'string' have pattern  "now+np", where n - number, p - char of time (m - minutes, h - hours, d - days) => datetime.now()+timedeltaOfPattern.\n
+           For example "now+7d" => datetime.now()+timedelta(days=7)
+     * Else datetime.fromisoformat('string')
+    """
     if(string.startswith("now")):
         startDatetime: datetime = datetime.now()
         i: int = 3
@@ -39,7 +55,13 @@ def getDatetimeFrom(string: str) -> datetime:
 def getTimeIntervalFrom(string: str, minutes: tuple[int, int] = DeltaDatetimeValidDiapasons.minutes,
                         hours: tuple[int, int] = DeltaDatetimeValidDiapasons.hours,
                         days: tuple[int, int] = DeltaDatetimeValidDiapasons.days) -> tuple[str, int]:
-    
+    """
+    Returns 'time interval' in tuple[str, int], where timeInterval[0] is the given string and timeInterval[1] is the given interval in ms.\n
+    Returns timeInterval[0] = 'string' and timeInterval[1] = -1 if 'string' not is time interval.\n
+    Returns timeInterval[0] = 'm' and timeInterval[1] = -1 if 'string' contains 'm' but have not number or number is not valid.\n
+    Returns timeInterval[0] = 'h' and timeInterval[1] = -1 if 'string' contains 'h' but have not number or number is not valid.\n
+    Returns timeInterval[0] = 'd' and timeInterval[1] = -1 if 'string' contains 'd' but have not number or number is not valid.\n
+    """
     timeIntervalInMs: int = -1
     minutesValidDiaposon: tuple[int, int] = minutes
     hoursValidDiaposon: tuple[int, int] = hours

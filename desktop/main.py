@@ -1,6 +1,6 @@
-from .firstscreen import *
-from .secondscreen import *
-from .exitscreen import*
+from .firstscreen import FirstScreenExecutor
+from .secondscreen import SecondScreenExecutor
+from .exitscreen import ExitScreenExecutor
 from .executor import ScreenExecutor
 from .general import FILE_NAME_WITH_CRYPTOCURRENCIES
 
@@ -29,7 +29,7 @@ def inputScreenNumberFromMenu() -> int:
     print("Input screen number:", end=" ")
     inputedVariant: str = input()
     while(not inputedVariant.isdigit() or int(inputedVariant) not in VALID_SCREEN_NUMBERS):
-        print("Error. Need input the integer number biggers or equals 1 and less or equals 3!")
+        print(f"Error. Need input the integer number biggers or equals {VALID_SCREEN_NUMBERS[0]} and less or equals {VALID_SCREEN_NUMBERS[-1]}!")
         print("Try again:", end=" ")
         inputedVariant = input()
 
@@ -46,4 +46,7 @@ def compelete(variant: int) -> bool:
     return EXECUTORS[variant].execute()
 
 def printExit():
+    """
+    Output last words
+    """
     print("Program work ended.")

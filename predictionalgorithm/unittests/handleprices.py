@@ -64,22 +64,22 @@ def handlePricesOf(cryptocurrencies: list[str], parameters: ParametersToModellin
 
             print("-------------------------------------")
 
-            print(f"* truth open price: {priceToPredict.open}$, datetime: {priceToPredict.time.strftime(STR_DATE_FORMAT)}")
-            print(f"* predicted open price: {predictedOpenPriceValue}$, datetime: {predictedOpenPriceDatetime.strftime(STR_DATE_FORMAT)}")
+            print(f"* truth open price: {priceToPredict.open:.3f}$, datetime: {priceToPredict.time.strftime(STR_DATE_FORMAT)}")
+            print(f"* predicted open price: {predictedOpenPriceValue:.3f}$, datetime: {predictedOpenPriceDatetime.strftime(STR_DATE_FORMAT)}")
 
             precentOfDeltaOpenPrices.append((priceToPredict.open-predictedOpenPriceValue)/priceToPredict.open * 100)
-            print(f"* precent difference: {precentOfDeltaOpenPrices[-1]}%")
+            print(f"* precent difference: {precentOfDeltaOpenPrices[-1]:.3f}%")
             
             if(printDeltaPriceResult(priceToPredict.open, predictedOpenPriceValue, parsedPrices[-1].open)):
                 deltaPricePredictedCount += 1
 
             print("-------------------------------------")
 
-            print(f"* truth close price: {priceToPredict.close}$, datetime: {priceToPredict.time.strftime(STR_DATE_FORMAT)}")
-            print(f"* predicted close price: {predictedClosePriceValue}$, datetime: {predictedClosePriceDatetime.strftime(STR_DATE_FORMAT)}")
+            print(f"* truth close price: {priceToPredict.close:.3f}$, datetime: {priceToPredict.time.strftime(STR_DATE_FORMAT)}")
+            print(f"* predicted close price: {predictedClosePriceValue:.3f}$, datetime: {predictedClosePriceDatetime.strftime(STR_DATE_FORMAT)}")
 
             precentOfDeltaClosePrices.append((priceToPredict.close-predictedClosePriceValue)/priceToPredict.close * 100)
-            print(f"* precent difference: {precentOfDeltaClosePrices[-1]}%")
+            print(f"* precent difference: {precentOfDeltaClosePrices[-1]:.3f}%")
 
             if(printDeltaPriceResult(priceToPredict.close, predictedClosePriceValue, parsedPrices[-1].close)):
                 deltaPricePredictedCount += 1
@@ -97,12 +97,12 @@ def handlePricesOf(cryptocurrencies: list[str], parameters: ParametersToModellin
     print("TEST RESULT:")
     print(f"* all test count(with open and close prices): {testcaseCount*2}")
     print(f"* delta price(open and close) truth predicted count: {deltaPricePredictedCount}")
-    print(f"* precent of test count with true predicted delta prices: {deltaPricePredictedCount/(testcaseCount*2)*100}%")
+    print(f"* precent of test count with true predicted delta prices: {deltaPricePredictedCount/(testcaseCount*2)*100:.3f}%")
     
     print()
 
-    print(f"* median predictioned precent of open prices: {precentOfDeltaOpenPrices[testcaseCount//2]}%")
-    print(f"* median predictioned precent of close prices: {precentOfDeltaClosePrices[testcaseCount//2]}%")
+    print(f"* median predictioned precent of open prices: {precentOfDeltaOpenPrices[testcaseCount//2]:.3f}%")
+    print(f"* median predictioned precent of close prices: {precentOfDeltaClosePrices[testcaseCount//2]:.3f}%")
 
     print()
 
@@ -117,7 +117,7 @@ def printDeltaPriceResult(sourcePrice: float, predictedPrice: float, pastPrice: 
 
     realDeltaPrice: float = sourcePrice - pastPrice
     predictedDeltaPrice: float = predictedPrice - pastPrice
-    print(f"* measuring direction from price: {pastPrice}$")
+    print(f"* measuring direction from price: {pastPrice:.3f}$")
 
     if(realDeltaPrice*predictedDeltaPrice >= 0):
         print(f"* TRUTH. Delta price predicted!")

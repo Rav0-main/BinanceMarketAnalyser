@@ -1,0 +1,5 @@
+STRICT_COMMAND_CHECKING: str = "strict"
+START_DATETIMES_COMMAND: str = "start-datetimes"
+END_DATETIMES_COMMAND: str = "end-datetimes"
+FUTURE_DATETIMES_COMMAND: str = "future-datetimes"
+TIME_INTERVALS_COMMAND: str = "time-intervals"

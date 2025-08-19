@@ -1,1 +1,2 @@
-from .algorithm import *
+from .algorithm import (getPredictedFuturePricesIn,
+                        generateAllImportanceCoefficients)

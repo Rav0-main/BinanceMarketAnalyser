@@ -60,7 +60,7 @@ class PriceParserBinanceAPI:
     
 def getXYFormatFrom(prices: list[PriceInformation]) -> tuple[list[tuple[int, float]], list[tuple[int, float]]]:
     """
-    Returns (open_prices, close_prices) from 'prices'
+    Returns (openPrices, closePrices) from 'prices'
     """
     openPrices: list[tuple[int, float]] = []
     closePrices: list[tuple[int, float]] = []

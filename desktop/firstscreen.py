@@ -5,116 +5,134 @@ rootDirectory = osPath.dirname(osPath.dirname(osPath.abspath(__file__)))
 sysPath.append(rootDirectory)
 
 from .executor import ScreenExecutor
-from .datetimeparser import *
+from .datetimeparser import (getDatetimeFrom,
+                             getTimeIntervalFrom)
 from .cryptocurrencychecker import cryptocurrencyExistsOnMarket
 from .general import (TimeIntervalValidDiapasons,
                       STR_DATE_FORMAT)
-from priceparser import *
+from priceparser import (PriceParserBinanceAPI,
+                         PriceInformation,
+                         getXYFormatFrom)
 from datetime import datetime
-from predictionalgorithm import *
+from predictionalgorithm import getPredictedFuturePricesIn
 import graphic
 
 class FirstScreenExecutor(ScreenExecutor):
-    cryptocurrency: str
-    startDatetime: datetime
-    endDatetime: datetime
-    futureDatetime: datetime
-    timeInterval: str
-    timeIntervalInMs: int
+    """
+    The first screen's executor requests the necessary information - the start date, the end date, the future date, the interval, and displays a price graph over time.
+    """
+
+    __cryptocurrency: str
+    __startDatetime: datetime
+    __endDatetime: datetime
+    __futureDatetime: datetime
+    __timeInterval: str
+    __timeIntervalInMs: int
 
     def __init__(self):
         pass
 
     def execute(self) -> bool:
         self.__inputCryptocurrencyAndDatetimes()
+        print("Graphic launching...")
         self.__showGraphicWithPredictedPrices()
         return False
 
     def __inputCryptocurrencyAndDatetimes(self):
         run: bool = True
 
-        print("Input the cryprocurrency symbol:")
+        print("Input the cryptocurrency symbol:", end=" ")
         while(run):
-            self.cryptocurrency: str = input()
-            if(cryptocurrencyExistsOnMarket(self.cryptocurrency)):
+            self.__cryptocurrency: str = input()
+            if(cryptocurrencyExistsOnMarket(self.__cryptocurrency)):
                 run = False
             else:
                 print("Error. You have probably entered the wrong currency or are not connected to the internet.")
+                print("Try again:", end=" ")
 
         print("Enter dates in the format yyyy-mm-dd.")
         run = True
         while(run):
-            print("Start date:")
+            print("Start date:", end=" ")
             try:
-                self.startDatetime: datetime = getDatetimeFrom(input())
+                self.__startDatetime: datetime = getDatetimeFrom(input())
                 run = False
             except ValueError:
-                print("Error. You entered it incorrectly, need yyyy-mm-dd!")
+                print("Error. Not valid format!")
+                print("Try again.")
 
         run = True
         while(run):
-            print("End date:")
+            print("End date:", end=" ")
             try:
-                self.endDatetime: datetime = getDatetimeFrom(input())
+                self.__endDatetime: datetime = getDatetimeFrom(input())
 
-                if(self.startDatetime < self.endDatetime):
+                if(self.__startDatetime < self.__endDatetime):
                     run = False
                 else:
                     print("Error. The start date must be earlier than the end date!")
+                    print("Try again.")
 
             except ValueError:
-                print("Error. You entered it incorrectly, need yyyy-mm-dd!")
+                print("Error. Not valid format!")
+                print("Try again.")
 
         run = True
         while(run):
-            print("Future date:")
+            print("Future date:", end=" ")
             try:
-                self.futureDatetime: datetime = getDatetimeFrom(input())
+                self.__futureDatetime: datetime = getDatetimeFrom(input())
 
-                if(self.endDatetime < self.futureDatetime):
+                if(self.__endDatetime < self.__futureDatetime):
                     run = False
                 else:
                     print("Error. The end date must be earlier than the future date!")
+                    print("Try again.")
                     
             except ValueError:
-                print("Error. You entered it incorrectly, need yyyy-mm-dd!")
+                print("Error. Not valid format!")
+                print("Try again.")
 
+        print("Input time interval, for example 5m, 1h, 1d and etc:", end=" ")
         run = True
         while(run):
-            print("Input time interval, for example 5m, 1h, 1d and etc.")
-            self.timeInterval = input()
+            self.__timeInterval = input()
 
-            timeIntervalParsingResult: tuple[str, int] = getTimeIntervalFrom(self.timeInterval,
+            timeIntervalParsingResult: tuple[str, int] = getTimeIntervalFrom(self.__timeInterval,
                                                                              minutes=TimeIntervalValidDiapasons.minutes,
                                                                              hours=TimeIntervalValidDiapasons.hours,
                                                                              days=TimeIntervalValidDiapasons.days)
 
             if(timeIntervalParsingResult[0] == 'm'):
                 print(f"Error. Format minutes is nm, where n biggers or equals {TimeIntervalValidDiapasons.minutes[0]} and less or equals {TimeIntervalValidDiapasons.minutes[1]}.")
+                print("Try again:", end=" ")
             
             elif(timeIntervalParsingResult[0] == 'h'):
                 print(f"Error. Format hours is nh, where n biggers or equals {TimeIntervalValidDiapasons.hours[0]} and less or equals {TimeIntervalValidDiapasons.hours[1]}.")
-
+                print("Try again:", end=" ")
+            
             elif(timeIntervalParsingResult[0] == 'd'):
                 print(f"Error. Format days is nd, where n biggers or equals {TimeIntervalValidDiapasons.days[0]} and less or equals {TimeIntervalValidDiapasons.days[1]}.")
-
+                print("Try again:", end=" ")
+            
             elif(timeIntervalParsingResult[1] == -1):
                 print("Error. Not valid format!")
+                print("Try again:", end=" ")
 
             else:
-                self.timeIntervalInMs = timeIntervalParsingResult[1]
+                self.__timeIntervalInMs = timeIntervalParsingResult[1]
                 run = False
 
     def __showGraphicWithPredictedPrices(self):
-        cryptocurrenctParser: PriceParserBinanceAPI = PriceParserBinanceAPI(self.cryptocurrency)
-        cryptocurrenctParser.timeInterval = self.timeInterval
-        cryptocurrenctParser.priceCount = int((self.endDatetime.timestamp()-self.startDatetime.timestamp())*1000)//self.timeIntervalInMs
+        cryptocurrencyParser = PriceParserBinanceAPI(self.__cryptocurrency)
+        cryptocurrencyParser.timeInterval = self.__timeInterval
+        cryptocurrencyParser.priceCount = int((self.__endDatetime.timestamp()-self.__startDatetime.timestamp())*1000)//self.__timeIntervalInMs
 
-        sourcePrices: list[PriceInformation] = cryptocurrenctParser.getPricesByProperties(self.startDatetime, self.endDatetime)
+        sourcePrices: list[PriceInformation] = cryptocurrencyParser.getPricesByProperties(self.__startDatetime, self.__endDatetime)
 
         openPrices, closePrices = getXYFormatFrom(sourcePrices)
 
-        futureDatetime: int = int(self.futureDatetime.timestamp()*1000)
+        futureDatetime: int = int(self.__futureDatetime.timestamp()*1000)
         futureOpenPrices = getPredictedFuturePricesIn(openPrices, futureDatetime)
         futureClosePrices = getPredictedFuturePricesIn(closePrices, futureDatetime)
 
@@ -135,7 +153,7 @@ class FirstScreenExecutor(ScreenExecutor):
         graphic.drawLiniearGraphic(futureOpenDatetimes, futureOpenPriceValues, "orange", "Predicted open prices")
         graphic.drawLiniearGraphic(futureCloseDatetimes, futureClosePriceValues, "purple", "Predicted close prices")
 
-        graphic.setTitleName(f"{self.cryptocurrency} prices by datetime")
+        graphic.setTitleName(f"{self.__cryptocurrency} prices by datetime")
         graphic.setXLabel(f"Datetime, format: {STR_DATE_FORMAT}")
         graphic.setYLabel("Price, $")
 
@@ -143,4 +161,5 @@ class FirstScreenExecutor(ScreenExecutor):
         graphic.setPriceFormat()
 
         graphic.showLegend()
+        print("Graphic launched.")
         graphic.show()

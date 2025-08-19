@@ -4,51 +4,20 @@ from sys import path as sysPath
 rootDirectory = osPath.dirname(osPath.dirname(osPath.abspath(__file__)))
 sysPath.append(rootDirectory)
 
-from .executor import ScreenExecutor
-from .cryptocurrencychecker import cryptocurrencyExistsOnMarket
-from .datetimeparser import (getTimeIntervalFrom,
-                             getDatetimeFrom)
-from .general import *
-from priceparser import *
-from predictionalgorithm import getPredictedFuturePricesIn
-from dataclasses import dataclass
-from datetime import datetime
+rootDirectory = osPath.dirname(rootDirectory)
+sysPath.append(rootDirectory)
+
+from .cryptocurrencyinformation import CryptocurrencyInformation
+from .strcommands import *
 from typing import Any
+from general import (TimeIntervalValidDiapasons,
+                     FILE_NAME_WITH_CRYPTOCURRENCIES)
+from cryptocurrencychecker import cryptocurrencyExistsOnMarket
+from datetimeparser import (getDatetimeFrom,
+                            getTimeIntervalFrom)
+from datetime import datetime
 from json import load as jsonLoad
-from time import sleep
 
-STRICT_COMMAND_CHECKING: str = "strict"
-START_DATETIMES_COMMAND: str = "start-datetimes"
-END_DATETIMES_COMMAND: str = "end-datetimes"
-FUTURE_DATETIMES_COMMAND: str = "future-datetimes"
-TIME_INTERVALS_COMMAND: str = "time-intervals"
-
-@dataclass
-class CryptocurrencyInformation:
-    symbol: str
-    startDatetimes: list[datetime]
-    endDatetimes: list[datetime]
-    futureDatetimes: list[datetime]
-    timeIntervals: list[tuple[str, int]]
-
-class SecondScreenExecutor(ScreenExecutor):
-    cryptocurrencies: list[CryptocurrencyInformation] = []
-    isStrictParsing: bool = True
-
-    def __init__(self):
-        pass
-
-    def execute(self) -> bool:
-        self.__parseJsonContent()
-        self.__printAllPredictedPrice()
-        return False
-
-    def __parseJsonContent(self):
-        self.cryptocurrencies = CryptocurrencyJsonContentParser().parse(FILE_NAME_WITH_CRYPTOCURRENCIES)
-
-    def __printAllPredictedPrice(self):
-        PredictedPricePrinter().printPredictedPricesOf(self.cryptocurrencies)
-           
 class CryptocurrencyJsonContentParser:
     isStrictParsing: bool = True
     cryptocurrencies: list[CryptocurrencyInformation] = []
@@ -185,65 +154,3 @@ class CryptocurrencyJsonContentParser:
             data = jsonLoad(file)
 
         return data
-    
-class PredictedPricePrinter:
-    def __init__(self):
-        pass
-
-    def printPredictedPricesOf(self, cryptocurrencies: list[CryptocurrencyInformation]):
-        if(len(cryptocurrencies) == 0):
-            print("Error. Not valid cryptocurrencies!")
-            return
-        
-        for cryptocurrency in cryptocurrencies:
-            self.__printPredictedPricesOfOneCryptocurrency(cryptocurrency)
-
-    def __printPredictedPricesOfOneCryptocurrency(self, cryptocurrency: CryptocurrencyInformation):
-        priceParser = PriceParserBinanceAPI(cryptocurrency.symbol)
-        print(f"PREDICTION: {cryptocurrency.symbol.upper()}")
-        print("=================================================================")
-
-        for start, end, future, timeInterval, i in zip(cryptocurrency.startDatetimes,
-            cryptocurrency.endDatetimes, cryptocurrency.futureDatetimes,
-            cryptocurrency.timeIntervals, range(0, len(cryptocurrency.startDatetimes))
-            ):
-
-            priceParser.timeInterval = timeInterval[0]
-            priceParser.priceCount = int((end.timestamp()-start.timestamp())*1000) // timeInterval[1]
-            prices: list[PriceInformation] = priceParser.getPricesByProperties(start, end)
-            openPrices, closePrices = getXYFormatFrom(prices)
-            lastOpenPrice: tuple[int, float] = openPrices[-1]
-            lastClosePrice: tuple[int, float] = closePrices[-1]
-
-            futureDatetime: int = int(future.timestamp() * 1000)
-            futureOpenPrices = getPredictedFuturePricesIn(openPrices, futureDatetime)
-            futureClosePrices = getPredictedFuturePricesIn(closePrices, futureDatetime)
-
-            print("-----------------------------------------------------------------")
-            self.__printDatetimeInformation((start, end), timeInterval[0])
-
-            startInformation: str = "1. Open Price"
-            self.__printInformationAboutFuturePrice(startInformation, futureOpenPrices[-1], lastOpenPrice)
-
-            startInformation = "2. Close Price"
-            self.__printInformationAboutFuturePrice(startInformation, futureClosePrices[-1], lastClosePrice)
-
-            if(i % 4 == 0):
-                sleep(2)
-
-        print("=================================================================")
-        sleep(2)
-
-    def __printDatetimeInformation(self, datetimeInterval: tuple[datetime, datetime], timeInterval: str):
-        print("Datetime interval:")
-        print(f"From {datetimeInterval[0].strftime(STR_DATE_FORMAT)} to {datetimeInterval[1].strftime(STR_DATE_FORMAT)}")
-        print(f"Time interval: {timeInterval}")
-
-    def __printInformationAboutFuturePrice(self, startInformation: str, futurePrice: tuple[int, float], pastPrice: tuple[int, float]):
-        print(startInformation)
-        
-        pastDatetime: str = datetime.fromtimestamp(pastPrice[0]/1000).strftime(STR_DATE_FORMAT)
-        futureDatetime: str = datetime.fromtimestamp(futurePrice[0]/1000).strftime(STR_DATE_FORMAT)
-
-        print(f"Price from {pastPrice[1]}({pastDatetime}) move to {futurePrice[1]}({futureDatetime})")
-        print(f"The relative change is: {(futurePrice[1] - pastPrice[1])/futurePrice[1]*100}%")
