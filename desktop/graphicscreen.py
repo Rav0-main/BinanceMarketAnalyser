@@ -9,15 +9,17 @@ from .datetimeparser import (getDatetimeFrom,
                              getTimeIntervalFrom)
 from .cryptocurrencychecker import cryptocurrencyExistsOnMarket
 from .general import (TimeIntervalValidDiapasons,
-                      STR_DATE_FORMAT)
+                      STR_DATE_FORMAT,
+                      LOGGING_FILE_OF_SCREEN_WITH_GRAPHIC)
 from priceparser import (PriceParserBinanceAPI,
                          PriceInformation,
                          getXYFormatFrom)
 from datetime import datetime
 from predictionalgorithm import getPredictedFuturePricesIn
 import graphic
+from os import system
 
-class FirstScreenExecutor(ScreenExecutor):
+class ScreenExecutorWithGraphic(ScreenExecutor):
     """
     The first screen's executor requests the necessary information - the start date, the end date, the future date, the interval, and displays a price graph over time.
     """
@@ -28,9 +30,10 @@ class FirstScreenExecutor(ScreenExecutor):
     __futureDatetime: datetime
     __timeInterval: str
     __timeIntervalInMs: int
+    _logging: bool
 
-    def __init__(self):
-        pass
+    def __init__(self, logging: bool):
+        self._logging = logging
 
     def execute(self) -> bool:
         self.__inputCryptocurrencyAndDatetimes()
@@ -50,7 +53,7 @@ class FirstScreenExecutor(ScreenExecutor):
                 print("Error. You have probably entered the wrong currency or are not connected to the internet.")
                 print("Try again:", end=" ")
 
-        print("Enter dates in the format yyyy-mm-dd.")
+        print("Enter dates.")
         run = True
         while(run):
             print("Start date:", end=" ")
@@ -131,10 +134,15 @@ class FirstScreenExecutor(ScreenExecutor):
         sourcePrices: list[PriceInformation] = cryptocurrencyParser.getPricesByProperties(self.__startDatetime, self.__endDatetime)
 
         openPrices, closePrices = getXYFormatFrom(sourcePrices)
+        lastOpenPrice: tuple[int, float] = openPrices[-1]
+        lastClosePrice: tuple[int, float] = closePrices[-1]
 
         futureDatetime: int = int(self.__futureDatetime.timestamp()*1000)
         futureOpenPrices = getPredictedFuturePricesIn(openPrices, futureDatetime)
         futureClosePrices = getPredictedFuturePricesIn(closePrices, futureDatetime)
+
+        if(self._logging):
+            self.__logFutureOpenAndClosePrices((lastOpenPrice, futureOpenPrices[-1]), (lastClosePrice, futureClosePrices[-1]))
 
         graphic.drawPriceGraphics(sourcePrices)
 
@@ -163,3 +171,44 @@ class FirstScreenExecutor(ScreenExecutor):
         graphic.showLegend()
         print("Graphic launched.")
         graphic.show()
+
+    def __logFutureOpenAndClosePrices(self, openPriceInformation: tuple[tuple[int, float],tuple[int, float]], closePriceInformation: tuple[tuple[int, float], tuple[int, float]]):
+        startLine: str = f"{self.__cryptocurrency} graphic log.\nDatetime moment: {datetime.now().strftime(STR_DATE_FORMAT)}.\nDatetime interval: {self.__startDatetime.strftime(STR_DATE_FORMAT)} - {self.__endDatetime.strftime(STR_DATE_FORMAT)}.\nTime interval: {self.__timeInterval}.\nPredict on datetime: {self.__futureDatetime.strftime(STR_DATE_FORMAT)}."
+        dashLine: str = "-----------------------------------------------------------------"
+        openPriceLine: str = f"1. Open Price:\nPrice from {openPriceInformation[0][1]:.3f}$ ({datetime.fromtimestamp(openPriceInformation[0][0] / 1000).strftime(STR_DATE_FORMAT)}) move to {openPriceInformation[1][1]:.3f}$ ({datetime.fromtimestamp(openPriceInformation[1][0] / 1000).strftime(STR_DATE_FORMAT)}).\nRelative precent: {(openPriceInformation[1][1] - openPriceInformation[0][1]) / openPriceInformation[0][1]*100:.3f}%."
+        closePriceLine: str = f"2. Close Price:\nPrice from {closePriceInformation[0][1]:.3f}$ ({datetime.fromtimestamp(closePriceInformation[0][0] / 1000).strftime(STR_DATE_FORMAT)}) move to {closePriceInformation[1][1]:.3f}$ ({datetime.fromtimestamp(closePriceInformation[1][0] / 1000).strftime(STR_DATE_FORMAT)}).\nRelative precent: {(closePriceInformation[1][1] - closePriceInformation[0][1]) / closePriceInformation[0][1]*100:.3f}%."
+        
+        with open(LOGGING_FILE_OF_SCREEN_WITH_GRAPHIC, "w") as logger:
+            logger.write(startLine + "\n" + dashLine + "\n" + openPriceLine + "\n" + dashLine + "\n" + closePriceLine)
+
+class FirstScreenExecutor(ScreenExecutorWithGraphic):
+    _logging = False
+
+    def __init__(self):
+        pass
+
+class SecondScreenExecutor(ScreenExecutorWithGraphic):
+    _logging = True
+
+    def __init__(self):
+        pass
+
+class FifthScreenExecutor(ScreenExecutor):
+    def __init__(self):
+        pass
+
+    def execute(self) -> bool:
+        system("cls")
+        print("Screen requests data such as the start date, end date, future date, and time interval.\n\nBased on the provided data, it predicts the future price value and displays a graphic of price values on time.\n")
+        print(" * 'start date' - is start date to parsing of price values.")
+        print(" * 'end date' - is end date of parsing of price values.")
+        print(" * 'future date' - is future date to predict.")
+        print(" * 'time interval' - is time interval between price values in parsing data.")
+        print()
+        print("All dates must be in ISO format or relative format: 'now-ti' or 'now+ti' where ti - is time interval, for example now-30m, now-2h, now+1d")
+        print()
+        print("Time interval must be in format: 5m, 30m, 2h, 1d and etc.")
+        print()
+        print("Press <Enter> to continue")
+        input()
+        return False
