@@ -56,16 +56,16 @@ def drawPredictionPricesOf(symbol: str):
 
     futureTime: int = int((endTime + timedelta(hours=12)).timestamp()*1000)
 
-    futureOpenPrices = getPredictedFuturePricesIn(openPrices, futureTime)
-    futureClosePrices = getPredictedFuturePricesIn(closePrices, futureTime)
+    futureOpenPrices = getPredictionPricesIn(openPrices, futureTime)
+    futureClosePrices = getPredictionPricesIn(closePrices, futureTime)
 
     graphic.drawPriceGraphics(sourcePrices)
 
     futureOpenDatetimes = [datetime.fromtimestamp(x[0]/1000) for x in futureOpenPrices]
-    futureOpenDatetimes.insert(0, sourcePrices[-1].time)
+    futureOpenDatetimes.insert(0, sourcePrices[-1].datetime)
 
     futureCloseDatetimes = [datetime.fromtimestamp(x[0]/1000) for x in futureClosePrices]
-    futureCloseDatetimes.insert(0, sourcePrices[-1].time)
+    futureCloseDatetimes.insert(0, sourcePrices[-1].datetime)
 
     futureOpenPriceValues = [x[1] for x in futureOpenPrices]
     futureOpenPriceValues.insert(0, sourcePrices[-1].open)
@@ -105,7 +105,7 @@ def drawPredictionPriceWithRandomValues(minY: float, maxY: float):
 
         pastX += timedelta(hours=1)
 
-    futurePrices: list[tuple[int, float]] = getPredictedFuturePricesIn(generatedGraphic, int(datetime.now().timestamp()*1000))
+    futurePrices: list[tuple[int, float]] = getPredictionPricesIn(generatedGraphic, int(datetime.now().timestamp()*1000))
 
     graphic.drawLiniearGraphic(datetimes, prices, "green", "Source prices")
     futureDatetimes: list = [datetime.fromtimestamp(x[0]//1000) for x in futurePrices]
@@ -129,7 +129,7 @@ def drawPredictionPriceWithRandomValues(minY: float, maxY: float):
 def drawPredictionPricesOfSetValues(past: list[float], futureIndex: int):
     market: list[tuple[int, float]] = [(i, past[i]) for i in range(0, len(past))]
     
-    future: list[tuple[int, float]] = getPredictedFuturePricesIn(market, futureIndex)
+    future: list[tuple[int, float]] = getPredictionPricesIn(market, futureIndex)
     future.insert(0, (len(past)-1, past[-1]))
 
     graphic.drawLiniearGraphic([i for i in range(0, len(past))], past, "red", "Past")

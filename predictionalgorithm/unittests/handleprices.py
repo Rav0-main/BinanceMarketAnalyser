@@ -44,13 +44,13 @@ def handlePricesOf(cryptocurrencies: list[str], parameters: ParametersToModellin
             cryptocurrencyParser.timeInterval = timeInterval
             parsedPrices: list[PriceInformation] = cryptocurrencyParser.getPricesByProperties(time[0], time[1])
 
-            priceToPredict: PriceInformation = PriceInformation(parsedPrices[-1].time, parsedPrices[-1].open, parsedPrices[-1].close)
+            priceToPredict: PriceInformation = PriceInformation(parsedPrices[-1].datetime, parsedPrices[-1].open, parsedPrices[-1].close)
 
-            parsedPrices: list[PriceInformation] = [x for x in parsedPrices if (x.time <= endTimeOfInput)]
+            parsedPrices: list[PriceInformation] = [x for x in parsedPrices if (x.datetime <= endTimeOfInput)]
             openPrices, closePrices = getXYFormatFrom(parsedPrices)
             
-            openFuturePrices = getPredictedFuturePricesIn(openPrices, int(priceToPredict.time.timestamp()*1000))
-            closeFuturePrices = getPredictedFuturePricesIn(closePrices, int(priceToPredict.time.timestamp()*1000))
+            openFuturePrices = getPredictionPricesIn(openPrices, int(priceToPredict.datetime.timestamp()*1000))
+            closeFuturePrices = getPredictionPricesIn(closePrices, int(priceToPredict.datetime.timestamp()*1000))
 
             predictedOpenPriceValue: float = openFuturePrices[-1][1]
             predictedOpenPriceDatetime: datetime = datetime.fromtimestamp(openFuturePrices[-1][0]/1000)
@@ -59,12 +59,12 @@ def handlePricesOf(cryptocurrencies: list[str], parameters: ParametersToModellin
             predictedClosePriceDatetime: datetime = datetime.fromtimestamp(closeFuturePrices[-1][0]/1000)
 
             print(f"case №{i}:")
-            print(f"* parsing datetime moment: {time[0].strftime(STR_DATE_FORMAT)}-{parsedPrices[-1].time.strftime(STR_DATE_FORMAT)}")
+            print(f"* parsing datetime moment: {time[0].strftime(STR_DATE_FORMAT)}-{parsedPrices[-1].datetime.strftime(STR_DATE_FORMAT)}")
             print(f"* time interval: {timeInterval}")
 
             print("-------------------------------------")
 
-            print(f"* truth open price: {priceToPredict.open:.3f}$, datetime: {priceToPredict.time.strftime(STR_DATE_FORMAT)}")
+            print(f"* truth open price: {priceToPredict.open:.3f}$, datetime: {priceToPredict.datetime.strftime(STR_DATE_FORMAT)}")
             print(f"* predicted open price: {predictedOpenPriceValue:.3f}$, datetime: {predictedOpenPriceDatetime.strftime(STR_DATE_FORMAT)}")
 
             precentOfDeltaOpenPrices.append((priceToPredict.open-predictedOpenPriceValue)/priceToPredict.open * 100)
@@ -75,7 +75,7 @@ def handlePricesOf(cryptocurrencies: list[str], parameters: ParametersToModellin
 
             print("-------------------------------------")
 
-            print(f"* truth close price: {priceToPredict.close:.3f}$, datetime: {priceToPredict.time.strftime(STR_DATE_FORMAT)}")
+            print(f"* truth close price: {priceToPredict.close:.3f}$, datetime: {priceToPredict.datetime.strftime(STR_DATE_FORMAT)}")
             print(f"* predicted close price: {predictedClosePriceValue:.3f}$, datetime: {predictedClosePriceDatetime.strftime(STR_DATE_FORMAT)}")
 
             precentOfDeltaClosePrices.append((priceToPredict.close-predictedClosePriceValue)/priceToPredict.close * 100)

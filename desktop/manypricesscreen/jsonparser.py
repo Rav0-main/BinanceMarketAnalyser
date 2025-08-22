@@ -12,24 +12,26 @@ from .strcommands import *
 from typing import Any
 from general import (TimeIntervalValidDiapasons,
                      FILE_NAME_WITH_CRYPTOCURRENCIES)
-from cryptocurrencychecker import cryptocurrencyExistsOnMarket
+from cryptocurrencymanager import CryptocurrencyManager
 from datetimeparser import (getDatetimeFrom,
                             getTimeIntervalFrom)
 from datetime import datetime
 from json import load as jsonLoad
 
 class CryptocurrencyJsonContentParser:
-    isStrictParsing: bool = True
+    __isStrictParsing: bool = True
+    __cryptocurrencyManager: CryptocurrencyManager
     cryptocurrencies: list[CryptocurrencyInformation] = []
 
+
     def __init__(self):
-        pass
+        self.__cryptocurrencyManager = CryptocurrencyManager()
 
     def parse(self, fileName: str) -> list[CryptocurrencyInformation]:
         content: dict[str, Any] = self.__getJsonContentOf(fileName)
 
         if(STRICT_COMMAND_CHECKING in content and content[STRICT_COMMAND_CHECKING] == 0):
-            self.isStrictParsing = False
+            self.__isStrictParsing = False
         
         for symbol in content.keys():
             if(symbol == STRICT_COMMAND_CHECKING):
@@ -37,7 +39,7 @@ class CryptocurrencyJsonContentParser:
 
             print(f"Extracting {symbol} from {FILE_NAME_WITH_CRYPTOCURRENCIES}...")
             successParse: bool = self.__parseOneCryptocurrency(symbol, content[symbol])
-            if(not successParse and self.isStrictParsing):
+            if(not successParse and self.__isStrictParsing):
                 return []
             elif(successParse):
                 print("OK.")
@@ -48,7 +50,7 @@ class CryptocurrencyJsonContentParser:
         """
         Returns True if symbol parsed success else False
         """
-        if(not cryptocurrencyExistsOnMarket(symbol)):
+        if(not self.__cryptocurrencyManager.existsOnMarket(symbol)):
             print(f"Error. Cryptocurrency not exists on market: {symbol}!")
             return False
 
@@ -117,19 +119,19 @@ class CryptocurrencyJsonContentParser:
                                                                                 days=TimeIntervalValidDiapasons.days)
                 if(currentStartDatetime >= currentEndDatetime):
                     print(f"Error. In {symbol} - {i+1}-th of {START_DATETIMES_COMMAND} must be < {i+1}-th of {END_DATETIMES_COMMAND}!")
-                    if(self.isStrictParsing):
+                    if(self.__isStrictParsing):
                         return False
                     continue
 
                 elif(currentEndDatetime >= currentFutureDatetime):
                     print(f"Error. In {symbol} - {i+1}-th of {END_DATETIMES_COMMAND} must be < {i+1}-th of {FUTURE_DATETIMES_COMMAND}!")
-                    if(self.isStrictParsing):
+                    if(self.__isStrictParsing):
                         return False
                     continue
 
                 elif(currentTimeInterval[1] == -1):
                     print(f"Error. In {symbol} - {i+1}-th time interval must be valid format!")
-                    if(self.isStrictParsing):
+                    if(self.__isStrictParsing):
                         return False
                     continue
 

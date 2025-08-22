@@ -1,3 +1,4 @@
-from .main import (ThirdScreenExecutor,
-                   FourthScreenExecutor,
-                   SixthScreenExecutor)
+from .main import (ManyPricesScreenViewerWithoutLogging,
+                   ManyPricesScreenViewerWithLogging,
+                   DocumentationScreenOfManyPricesViewer,
+                   LoggingOutputerOfManyPricesViewerScreen)

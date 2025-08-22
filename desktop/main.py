@@ -1,42 +1,52 @@
-from .graphicscreen import (FirstScreenExecutor,
-                            SecondScreenExecutor,
-                            FifthScreenExecutor)
-from .manypricesscreen import (ThirdScreenExecutor,
-                               FourthScreenExecutor,
-                               SixthScreenExecutor)
+from .graphicscreen import (GraphicViewerScreenWithoutLogging,
+                            GraphicViewerScreenWithLogging,
+                            DocumentationScreenOfGraphicViewer,
+                            LoggingOutputerOfGraphicViewerScreen)
+from .manypricesscreen import (ManyPricesScreenViewerWithoutLogging,
+                               ManyPricesScreenViewerWithLogging,
+                               DocumentationScreenOfManyPricesViewer,
+                               LoggingOutputerOfManyPricesViewerScreen)
 from .exitscreen import ExitScreenExecutor
 from .executor import ScreenExecutor
 from .general import (FILE_NAME_WITH_CRYPTOCURRENCIES,
                       LOGGING_FILE_OF_SCREEN_WITH_GRAPHIC,
                       LOGGING_FILE_OF_SCREEN_WITH_MANY_PRICES)
 
-VALID_SCREEN_NUMBERS: list[int] = [i for i in range(1, 8)]
+VALID_SCREEN_NUMBERS: list[int] = [i for i in range(1, 10)]
 
 EXECUTORS: dict[int, ScreenExecutor] = {
-    1: FirstScreenExecutor(),
-    2: SecondScreenExecutor(),
-    3: ThirdScreenExecutor(),
-    4: FourthScreenExecutor(),
-    5: FifthScreenExecutor(),
-    6: SixthScreenExecutor(),
-    7: ExitScreenExecutor()
+    1: GraphicViewerScreenWithoutLogging(),
+    2: GraphicViewerScreenWithLogging(),
+    3: LoggingOutputerOfGraphicViewerScreen(),
+
+    4: ManyPricesScreenViewerWithoutLogging(),
+    5: ManyPricesScreenViewerWithLogging(),
+    6: LoggingOutputerOfManyPricesViewerScreen(),
+
+    7: DocumentationScreenOfGraphicViewer(),
+    8: DocumentationScreenOfManyPricesViewer(),
+    
+    9: ExitScreenExecutor()
 }
 
 def printVersion():
     print("DESKTOP VERSION")
 
 def printMenuScreen():
-    firstCommand: str = "Show graphic of one cryptocurrency"
-    secondCommand: str = f"Get prediction prices from '{FILE_NAME_WITH_CRYPTOCURRENCIES}'"
+    firstCommand: str = "View graphic of one cryptocurrency"
+    secondCommand: str = f"View prediction prices from '{FILE_NAME_WITH_CRYPTOCURRENCIES}'"
+    thirdCommand: str = f"Output logging content of"
 
     print("MENU:")
     print(f"1. {firstCommand}")
     print(f"2. {firstCommand} with logging in '{LOGGING_FILE_OF_SCREEN_WITH_GRAPHIC}'")
-    print(f"3. {secondCommand}")
-    print(f"4. {secondCommand} with logging in '{LOGGING_FILE_OF_SCREEN_WITH_MANY_PRICES}'")
-    print(f"5. {firstCommand} documentation")
-    print(f"6. {secondCommand} documentation")
-    print("7. Exit")
+    print(f"3. {thirdCommand} '{LOGGING_FILE_OF_SCREEN_WITH_GRAPHIC}'")
+    print(f"4. {secondCommand}")
+    print(f"5. {secondCommand} with logging in '{LOGGING_FILE_OF_SCREEN_WITH_MANY_PRICES}'")
+    print(f"6. {thirdCommand} '{LOGGING_FILE_OF_SCREEN_WITH_MANY_PRICES}'")
+    print(f"7. {firstCommand} documentation")
+    print(f"8. {secondCommand} documentation")
+    print("9. Exit")
 
 def inputScreenNumberFromMenu() -> int:
     print("Input screen number:", end=" ")

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class PriceInformation:
-    time: datetime
+    datetime: datetime
     open: float
     close: float
 
@@ -67,7 +67,7 @@ def getXYFormatFrom(prices: list[PriceInformation]) -> tuple[list[tuple[int, flo
 
     timestamp: int = 0
     for price in prices:
-        timestamp = int(price.time.timestamp() * 1000)
+        timestamp = int(price.datetime.timestamp() * 1000)
         openPrices.append((timestamp, price.open))
         closePrices.append((timestamp, price.close))
 

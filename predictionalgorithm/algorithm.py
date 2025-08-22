@@ -31,7 +31,7 @@ def generateAllImportanceCoefficients(marketGraphic: list[tuple[int, float]]) ->
     
     return pResults
 
-def getPredictedFuturePricesIn(marketGraphic: list[tuple[int, float]], futureDatetime: int) -> list[tuple[int, float]]:
+def getPredictionPricesIn(marketGraphic: list[tuple[int, float]], futureDatetime: int) -> list[tuple[int, float]]:
     """
     TIME COMPLEXITY: O(3 * (2*n + k)/2 * (k+1)) ~ O(n*k), n = len(marketGraphic), k = count prices to predict\n
     MEMORY COMPLEXITY: O(k+m), k = len(biggest_monotonic_sequence), m = count upping and downing sequence

@@ -32,7 +32,7 @@ def drawPriceGraphics(prices: list[PriceInformation], showOpenPrices=True, showC
     for price in prices:
         openPrices.append(price.open)
         closePrices.append(price.close)
-        times.append(price.time)
+        times.append(price.datetime)
 
     plt.figure(figsize=(12, 6))
 
@@ -57,3 +57,6 @@ def showLegend():
 
 def show():
     plt.show()
+
+def close():
+    plt.close("all")
