@@ -35,11 +35,11 @@ class DataInputerOfGraphicScreen:
 
         print("Input the cryptocurrency symbol:", end=" ")
         while(run):
-            self.__cryptocurrency: str = input()
+            self.__cryptocurrency: str = input().upper()
             if(self.__cryptocurrencyManager.existsOnMarket(self.__cryptocurrency)):
                 run = False
             else:
-                print("Error. You have probably entered the wrong currency or are not connected to the internet.")
+                print("Error. You have probably entered the wrong currency!")
                 print("Try again:", end=" ")
 
     def __inputStartDatetime(self):

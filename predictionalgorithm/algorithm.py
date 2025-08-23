@@ -11,6 +11,9 @@ def generateAllImportanceCoefficients(marketGraphic: list[tuple[int, float]]) ->
     1) * marketGraphic[i][0] - timestamp in ms\n
        * marketGraphic[i][1] - price value\n
     """
+    if(len(marketGraphic) < 3):
+        raise ValueError("len(marketGraphic) must be >= 3. By one line can not predict")
+
     priceIterator = map(lambda x: x[1], marketGraphic)
     maxPrice: float = max(priceIterator)
     
@@ -41,6 +44,8 @@ def getPredictionPricesIn(marketGraphic: list[tuple[int, float]], futureDatetime
     2) * futureDatetime - timestamp in ms > marketGraphic[-1][0]\n
     3) * changes a marketGraphic for adding future prices\n
     """
+    if(len(marketGraphic) < 3):
+        raise ValueError("len(marketGraphic) must be >= 3. By one line can not predict")
     
     futurePrices: list[tuple[int, float]] = []
 

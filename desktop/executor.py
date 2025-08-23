@@ -53,6 +53,10 @@ class ScreenOfLoggingOutputer(ScreenExecutor):
     def execute(self) -> bool:
         system("cls")
 
+        if(not osPath.exists(self._loggingFileName)):
+            print(f"Error. File with name {self._loggingFileName} not found!")
+            return False
+
         newLoggingFileName = self._loggingFileName[:self._loggingFileName.index(".")] + "-temporary.txt"
         self.__newLoggingFile = open(newLoggingFileName, "w")
 

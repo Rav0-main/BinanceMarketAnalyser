@@ -8,9 +8,6 @@ class PriceInformation:
     open: float
     close: float
 
-class NotSetPropertyException(Exception):
-    pass
-
 class PriceParserBinanceAPI:
     cryptocurrencySymbol: str
     timeInterval: str | None = None
@@ -56,7 +53,7 @@ class PriceParserBinanceAPI:
         return result
 
     def __raisePropertyNotInited(self, propertyName: str):
-        raise NotSetPropertyException(f"Property '{propertyName}' not set!")
+        raise ValueError(f"Property '{propertyName}' not set!")
     
 def getXYFormatFrom(prices: list[PriceInformation]) -> tuple[list[tuple[int, float]], list[tuple[int, float]]]:
     """
